@@ -1,0 +1,11 @@
+galaxy_info:
+  author: Pekka Wallendahl
+  description: Layout to distribute PXE/kickstart files via HTTPD
+  company:
+  license: MIT
+  # Tested with 2.4
+  min_ansible_version: 2.4
+  galaxy_tags: []
+dependencies: []
+  - bertvv.bind
+  - bertvv.httpd

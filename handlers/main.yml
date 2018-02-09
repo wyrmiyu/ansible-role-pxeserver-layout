@@ -1,0 +1,7 @@
+---
+# handlers file for pxeserver_prep
+
+- name: restart named
+  service:
+    name: named
+    state: restarted

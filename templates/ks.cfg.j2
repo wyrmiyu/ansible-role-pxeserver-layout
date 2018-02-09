@@ -1,0 +1,23 @@
+%pre
+for dev in sd{a,b,c,d,e}; do
+  [[ -e /dev/${dev} ]] || continue
+  dd if=/dev/zero of=/dev/${dev} bs=424200000 count=1
+done
+
+%end
+
+liveimg --url=http://{{ pxeserver_ip }}/{{ mounted_iso_uri }}/{{ item.name }}-squashfs.img
+network --bootproto=dhcp
+rootpw --plaintext {{ ks_root_pass }}
+timezone --utc Europe/Helsinki
+text
+zerombr
+ignoredisk --only-use=sda
+clearpart --all
+autopart --type=thinp
+reboot
+
+%post --erroronfail
+nodectl init
+{# imgbase layout --init #}
+%end

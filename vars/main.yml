@@ -1,0 +1,7 @@
+# roles/pxeserver-layout/vars/main.yml
+---
+
+pxe_httpd_path: "{{ httpd_DocumentRoot }}/{{ pxe_env_uri }}"
+mounted_iso_path: "{{ httpd_DocumentRoot }}/{{ mounted_iso_uri }}"
+iso_path: "{{ httpd_DocumentRoot }}/{{ iso_uri }}"
+ks_path: "{{ httpd_DocumentRoot }}/{{ ks_uri }}"

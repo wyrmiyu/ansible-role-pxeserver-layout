@@ -1,0 +1,84 @@
+# roles/pxeserver-layout/tasks/main.yml
+---
+
+- name: Set system to use its own bind service as its DNS resolver
+  copy:
+    dest: /etc/resolv.conf
+    content: |
+      # Managed by Ansible
+      search {{ domain }}
+      nameserver 127.0.0.1
+    owner: root
+    group: root
+    mode: 644
+  notify:
+    - restart named
+
+- name: Create base directories for image, iso and kickstart files
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ pxe_httpd_path }}"
+    - "{{ iso_path }}"
+    - "{{ ks_path }}"
+    - "{{ mounted_iso_path }}"
+  tags: pxeserver-layout
+
+- name: Create directories for repository mount points
+  file:
+    path: "{{ pxe_httpd_path }}/{{ item.name }}"
+    state: directory
+  with_items: "{{ pxeserver_images }}"
+  tags: pxeserver-layout
+
+- name: Copy boot images under the HTTPD docroot
+  copy:
+    src: "{{ iso_source_path }}/{{ item.isofile }}"
+    dest: "{{ iso_path }}/{{ item.isofile }}"
+    force: no
+  with_items: "{{ pxeserver_images }}"
+  tags: pxeserver-layout
+
+- name: Mount boot images under the docroot
+  mount:
+    src: "{{ iso_path }}/{{ item.isofile }}"
+    path: "{{ pxe_httpd_path }}/{{ item.name }}"
+    fstype: iso9660
+    opts: loop,ro,rootcontext="system_u:object_r:httpd_sys_content_t:s0"
+    state: mounted
+    boot: yes
+  with_items: "{{ pxeserver_images }}"
+  tags: pxeserver-layout
+
+- name: Copy kickstart files under the docroot
+  template:
+    dest: "{{ ks_path }}/{{ item.name }}.cfg"
+    src: ks.cfg.j2
+  with_items:
+    - "{{ pxeserver_images }}"
+
+- name: Prepare a temporary directory to extract a squashfs image
+  tempfile:
+    state: directory
+    suffix: iso-squashfs
+  register: tempdir
+
+- name: Extract the squashfs image from a RPM located on the mounted iso image
+  shell: |
+    workdir="{{ tempdir.path }}/{{ item.name }}"
+    mkdir -p "$workdir"
+    pushd "$workdir"
+    rpm2cpio {{ pxe_httpd_path }}/{{ item.name }}/Packages/redhat-virtualization-host-image-update* | cpio -id
+    find "$workdir" -type f -iname '*.squashfs.img' -exec rsync \{\} {{ mounted_iso_path }}/{{ item.name }}-squashfs.img \;
+    popd
+    rm -rf "$workdir"
+  args:
+    chdir: "{{ tempdir.path }}"
+  with_items:
+    - "{{ pxeserver_images }}"
+
+- name: Delete the temporary directory
+  file:
+    state: absent
+    path: "{{ tempdir.path }}"

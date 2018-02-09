@@ -1,0 +1,10 @@
+# roles/pxeserver-layout/defaults/main.yml
+---
+
+domain: example.com
+iso_source_path: "."
+ks_root_pass: password
+pxe_env_uri: pxe
+ks_uri: "{{ pxe_env_uri }}/ks"
+iso_uri: "{{ pxe_env_uri }}/isos"
+mounted_iso_uri: "{{ pxe_env_uri }}/mnt"
