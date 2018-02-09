@@ -11,12 +11,12 @@ This playbook has been created originally to be used with RHV-H iso images. It w
 - Copy over iso-images
 - Create directory structures under DocumentRoot
 - Loop mount those images
-- Extract RHV squashfs installtion image and put that in the directory tree
-- Create and put available kickstart configuration file
+- Extract RHV squashfs installation image and make it available through httpd
+- Create and make kickstart configuration file available
 
 ## Requirements
 
-This module is intended to be run with: https://github.com/wyrmiyu/ansible-role-pxeserver
+This role is intended to be run with and before: https://github.com/wyrmiyu/ansible-role-pxeserver
 
 ## Role Variables
 
