@@ -16,7 +16,7 @@ This playbook has been created originally to be used with RHV-H iso images. It w
 
 ## Requirements
 
-No specific requirements
+This module is intended to be run with: https://github.com/wyrmiyu/ansible-role-pxeserver
 
 ## Role Variables
 
