@@ -6,6 +6,6 @@ galaxy_info:
   # Tested with 2.4
   min_ansible_version: 2.4
   galaxy_tags: []
-dependencies: []
+dependencies: 
   - bertvv.bind
   - bertvv.httpd
